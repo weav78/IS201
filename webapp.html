@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Detroit Pistons Trivia Game</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial Black', sans-serif;
+      background-color: #1D42BA;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 60px;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      color: #C8102E;
+      font-size: 36px;
+      text-align: center;
+    }
+
+    #logo {
+      width: 80px;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    #scoreboard {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: white;
+      color: #1D42BA;
+      padding: 10px 20px;
+      font-size: 20px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    #timer {
+      position: absolute;
+      top: 20px;
+      left: 160px;
+      background: #C8102E;
+      color: white;
+      padding: 10px 20px;
+      font-size: 20px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    #quiz-box {
+      background: white;
+      color: #1D42BA;
+      border-radius: 12px;
+      padding: 30px;
+      width: 80%;
+      max-width: 600px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease-in-out;
+    }
+
+    #quiz-box.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #question {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .option {
+      background: #C8102E;
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .option:hover {
+      background: #a50f23;
+    }
+
+    #next-btn {
+      margin-top: 20px;
+      background: #1D42BA;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      display: none;
+    }
+
+    #result {
+      font-size: 24px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <img id="logo" src="assets/img/Detroit-Pistons-wallpaper-logo-desktop-NBA-2024-2025-thumb.jpg" alt="Pistons Logo">
+  <div id="scoreboard">Score: 0</div>
+  <div id="timer">Time: 10</div>
+  <h1>Detroit Pistons Trivia</h1>
+  <div id="quiz-box">
+    <div id="question">Question text</div>
+    <div id="options"></div>
+    <button id="next-btn">Next</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const fullQuestionBank = [
+  // Original 10 questions
+  { q: "In which year did the Pistons last win the NBA Championship?", options: ["1989", "2004", "1990", "2008"], answer: "2004" },
+  { q: "Which Pistons player was known as 'The Worm'?", options: ["Ben Wallace", "Dennis Rodman", "Chauncey Billups", "Joe Dumars"], answer: "Dennis Rodman" },
+  { q: "Which player was Finals MVP in 2004?", options: ["Rip Hamilton", "Ben Wallace", "Chauncey Billups", "Tayshaun Prince"], answer: "Chauncey Billups" },
+  { q: "Which arena was home to the Pistons before Little Caesars Arena?", options: ["The Palace of Auburn Hills", "Joe Louis Arena", "Ford Field", "Cobo Center"], answer: "The Palace of Auburn Hills" },
+  { q: "What are the official Pistons team colors?", options: ["Red, White, Blue", "Green and Black", "Orange and Purple", "Black and Yellow"], answer: "Red, White, Blue" },
+  { q: "Who blocked Reggie Miller’s layup in the 2004 playoffs?", options: ["Ben Wallace", "Tayshaun Prince", "Rip Hamilton", "Chauncey Billups"], answer: "Tayshaun Prince" },
+  { q: "Who was the head coach of the 1989 'Bad Boys' Pistons?", options: ["Chuck Daly", "Larry Brown", "Stan Van Gundy", "Doug Collins"], answer: "Chuck Daly" },
+  { q: "Cade Cunningham was drafted #1 overall in what year?", options: ["2019", "2020", "2021", "2022"], answer: "2021" },
+  { q: "Which Pistons center was known for his big afro and defense?", options: ["Ben Wallace", "Andre Drummond", "Darko Miličić", "Greg Monroe"], answer: "Ben Wallace" },
+  { q: "Where did the Pistons play before moving to Detroit?", options: ["Flint", "Fort Wayne", "Lansing", "Saginaw"], answer: "Fort Wayne" },
+
+  // NEW 30 questions
+  { q: "Which Pistons legend was known for his killer crossover and led the team in the '80s?", options: ["Grant Hill", "Joe Dumars", "Isiah Thomas", "Dave Bing"], answer: "Isiah Thomas" },
+  { q: "Who was the Pistons' head coach during their 2005 Finals run?", options: ["Larry Brown", "Flip Saunders", "Stan Van Gundy", "Dwane Casey"], answer: "Larry Brown" },
+  { q: "Which Piston famously said 'Both teams played hard'?", options: ["Chauncey Billups", "Rasheed Wallace", "Ben Wallace", "Allen Iverson"], answer: "Rasheed Wallace" },
+  { q: "What draft pick was Darko Miličić selected in 2003?", options: ["#1", "#2", "#3", "#4"], answer: "#2" },
+  { q: "Which Pistons forward was known for yelling 'Ball don't lie'?", options: ["Ben Wallace", "Rick Mahorn", "Rasheed Wallace", "Mark Aguirre"], answer: "Rasheed Wallace" },
+  { q: "Who did the Pistons beat in the 2004 NBA Finals?", options: ["Spurs", "Celtics", "Lakers", "Mavericks"], answer: "Lakers" },
+  { q: "What college did Grant Hill play for?", options: ["Duke", "North Carolina", "Georgetown", "Michigan"], answer: "Duke" },
+  { q: "Which Piston won Defensive Player of the Year four times?", options: ["Rick Mahorn", "Ben Wallace", "Dennis Rodman", "Joe Dumars"], answer: "Ben Wallace" },
+  { q: "What number did Chauncey Billups wear in Detroit?", options: ["3", "1", "7", "10"], answer: "1" },
+  { q: "Which Pistons player was known for his mid-range mask-wearing game?", options: ["Tayshaun Prince", "Rip Hamilton", "Grant Hill", "Reggie Jackson"], answer: "Rip Hamilton" },
+  { q: "Who was the first Pistons player to win NBA Rookie of the Year?", options: ["Grant Hill", "Dave Bing", "Kelly Tripucka", "Bob Lanier"], answer: "Dave Bing" },
+  { q: "Which Pistons coach was nicknamed 'Daddy Rich'?", options: ["Doug Collins", "Chuck Daly", "Larry Brown", "Flip Saunders"], answer: "Chuck Daly" },
+  { q: "Which 2000s Piston was nicknamed 'Big Ben'?", options: ["Ben Gordon", "Ben Wallace", "Antonio McDyess", "Jason Maxiell"], answer: "Ben Wallace" },
+  { q: "Who was the Pistons' GM during their 2004 championship run?", options: ["Joe Dumars", "Chuck Daly", "Stan Van Gundy", "Larry Brown"], answer: "Joe Dumars" },
+  { q: "Which Pistons player was part of the NBA’s 75th Anniversary Team?", options: ["Ben Wallace", "Rip Hamilton", "Chauncey Billups", "Isiah Thomas"], answer: "Isiah Thomas" },
+  { q: "Which Pistons player led the league in rebounds multiple times?", options: ["Andre Drummond", "Ben Wallace", "Bob Lanier", "Rick Mahorn"], answer: "Andre Drummond" },
+  { q: "Who did Detroit select #1 overall in the 2021 NBA Draft?", options: ["Jaden Ivey", "Cade Cunningham", "Jalen Green", "Evan Mobley"], answer: "Cade Cunningham" },
+  { q: "Who coached the Pistons in the 2010s and also served as team president?", options: ["Larry Brown", "Stan Van Gundy", "John Kuester", "Maurice Cheeks"], answer: "Stan Van Gundy" },
+  { q: "What was the Pistons' original name in Fort Wayne?", options: ["Zollner Pistons", "Iron Men", "Steelers", "Motor Kings"], answer: "Zollner Pistons" },
+  { q: "Which 1989 Finals opponent did the Pistons sweep?", options: ["Trail Blazers", "Lakers", "Bulls", "Celtics"], answer: "Lakers" },
+  { q: "Who led the Pistons in scoring during the 2004 NBA Finals?", options: ["Rip Hamilton", "Chauncey Billups", "Ben Wallace", "Tayshaun Prince"], answer: "Rip Hamilton" },
+  { q: "Which player came to Detroit in the trade for Grant Hill?", options: ["Ben Wallace", "Jerry Stackhouse", "Allan Houston", "Chauncey Billups"], answer: "Ben Wallace" },
+  { q: "Who was the Pistons' primary sixth man during the '04 championship run?", options: ["Lindsey Hunter", "Corliss Williamson", "Memo Okur", "Darvin Ham"], answer: "Corliss Williamson" },
+  { q: "What was the Pistons’ home court before The Palace?", options: ["Pontiac Silverdome", "Joe Louis Arena", "Cobo Hall", "Detroit Arena"], answer: "Pontiac Silverdome" },
+  { q: "Which Pistons coach once guaranteed a playoff spot… and missed?", options: ["Dwane Casey", "Stan Van Gundy", "Lawrence Frank", "Mo Cheeks"], answer: "Lawrence Frank" },
+  { q: "Which Pistons big man played for the team twice (pre and post-2000)?", options: ["Bob Lanier", "Terry Mills", "Ben Wallace", "Theo Ratliff"], answer: "Terry Mills" },
+  { q: "Who was known for his lockdown perimeter defense in the '80s–'90s?", options: ["Isiah Thomas", "Joe Dumars", "Mark Aguirre", "John Salley"], answer: "Joe Dumars" },
+  { q: "Who hit the game-winner in Game 5 of the 2005 ECF vs Miami?", options: ["Rip Hamilton", "Chauncey Billups", "Tayshaun Prince", "Rasheed Wallace"], answer: "Chauncey Billups" },
+  { q: "Which Pistons draftee played only 3 total games for the team?", options: ["Henry Ellenson", "Stanley Johnson", "Sekou Doumbouya", "Mateen Cleaves"], answer: "Mateen Cleaves" },
+  { q: "Who was the Pistons coach when Blake Griffin had his career-best season?", options: ["Dwane Casey", "Stan Van Gundy", "John Kuester", "Larry Brown"], answer: "Dwane Casey" }
+];
+
+    const scoreboard = document.getElementById('scoreboard');
+    const timerEl = document.getElementById('timer');
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const nextBtn = document.getElementById('next-btn');
+    const resultEl = document.getElementById('result');
+    const quizBox = document.getElementById('quiz-box');
+
+    let current = 0;
+    let score = 0;
+    let questions = [];
+    let timer;
+    let timeLeft = 10;
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function startGame() {
+      score = 0;
+      current = 0;
+      questions = shuffle([...fullQuestionBank]).slice(0, 5);
+      updateScore();
+      showQuestion();
+    }
+
+    function updateScore() {
+      scoreboard.textContent = `Score: ${score}`;
+    }
+
+    function startTimer() {
+      clearInterval(timer);
+      timeLeft = 10;
+      timerEl.textContent = `Time: ${timeLeft}`;
+      timer = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `Time: ${timeLeft}`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          autoFail();
+        }
+      }, 1000);
+    }
+
+    function autoFail() {
+      const correct = questions[current].answer;
+      const options = document.querySelectorAll('.option');
+      options.forEach(opt => {
+        opt.style.pointerEvents = 'none';
+        if (opt.textContent === correct) {
+          opt.style.background = 'green';
+        }
+      });
+      nextBtn.style.display = "inline-block";
+    }
+
+    function showQuestion() {
+      quizBox.classList.remove('show');
+      setTimeout(() => {
+        const q = questions[current];
+        resultEl.textContent = '';
+        nextBtn.style.display = "none";
+        questionEl.textContent = `Q${current + 1}: ${q.q}`;
+        optionsEl.innerHTML = '';
+
+        q.options.forEach(opt => {
+          const btn = document.createElement('div');
+          btn.classList.add('option');
+          btn.textContent = opt;
+          btn.addEventListener('click', () => selectAnswer(btn, q.answer));
+          optionsEl.appendChild(btn);
+        });
+
+        quizBox.classList.add('show');
+        startTimer();
+      }, 300);
+    }
+
+    function selectAnswer(selected, correct) {
+      clearInterval(timer);
+      const options = document.querySelectorAll('.option');
+      options.forEach(opt => {
+        opt.style.pointerEvents = 'none';
+        if (opt.textContent === correct) {
+          opt.style.background = 'green';
+        } else if (opt === selected) {
+          opt.style.background = 'darkred';
+        }
+      });
+
+      if (selected.textContent === correct) {
+        score++;
+        updateScore();
+      }
+
+      nextBtn.style.display = "inline-block";
+    }
+
+    nextBtn.addEventListener('click', () => {
+      current++;
+      if (current < questions.length) {
+        showQuestion();
+      } else {
+        showResult();
+      }
+    });
+
+    function showResult() {
+      clearInterval(timer);
+      questionEl.style.display = "none";
+      optionsEl.style.display = "none";
+      nextBtn.style.display = "none";
+      timerEl.style.display = "none";
+      resultEl.innerHTML = `🏀 Final Score: <strong>${score}</strong> out of <strong>${questions.length}</strong><br><br><button onclick="location.reload()">Play Again</button>`;
+    }
+
+    startGame();
+  </script>
+  <a href="index.html">Return to Main Site</a>
+  <a href="scratch.html">24-25 Pistons</a>
+</body>
+</html>

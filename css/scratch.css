@@ -1,0 +1,24 @@
+body {
+    background-color: #C8102E;
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+.emphasizedText{
+    font-weight: bolder;
+    text-decoration: underline;
+    color: #1D42BA;
+}
+
+.container{
+    display: flex;
+      align-items: flex-start; /* optional: aligns top edges */
+      gap: 50px; /* space between list and video */
+}
+
+.border{
+    border: 3px solid black;
+}
+
+.big{
+    font-size:400%;
+}
