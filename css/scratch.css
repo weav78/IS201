@@ -22,3 +22,7 @@ body {
 .big{
     font-size:400%;
 }
+
+.div-class {
+  position: static;
+}
